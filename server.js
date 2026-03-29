@@ -6,7 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Data storage
 let energyData = {
   voltage: 0,
   current: 0,
@@ -14,29 +13,27 @@ let energyData = {
   units: 0
 };
 
-// 🔹 UPDATE FROM ESP32
+// 🔹 RESET FLAG
+let resetFlag = false;
+
+// ESP UPDATE
 app.post("/api/update", (req, res) => {
   energyData = req.body;
-  console.log("Received:", energyData);
-  res.send("OK");
+  res.send({ reset: resetFlag });
 });
 
-// 🔹 GET DATA (Frontend)
+// FRONTEND GET
 app.get("/api/data", (req, res) => {
   res.json(energyData);
 });
 
-// 🔹 RESET UNITS (BUTTON)
+// RESET BUTTON
 app.post("/api/reset", (req, res) => {
+  resetFlag = true;
   energyData.units = 0;
-  console.log("Units reset!");
-  res.send("Reset Done");
-});
-
-// ROOT
-app.get("/", (req, res) => {
-  res.send("Backend running 🚀");
+  console.log("Reset triggered!");
+  res.send("Reset OK");
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log("Server started"));
+app.listen(PORT, () => console.log("Server running"));
