@@ -13,16 +13,22 @@ let energyData = {
   units: 0
 };
 
-// 🔹 RESET FLAG
 let resetFlag = false;
 
 // ESP UPDATE
 app.post("/api/update", (req, res) => {
   energyData = req.body;
+
+  // Send reset flag ONCE
   res.send({ reset: resetFlag });
+
+  // 🔥 IMPORTANT FIX
+  if (resetFlag === true) {
+    resetFlag = false;   // turn OFF after sending
+  }
 });
 
-// FRONTEND GET
+// GET DATA
 app.get("/api/data", (req, res) => {
   res.json(energyData);
 });
