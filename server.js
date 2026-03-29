@@ -6,37 +6,37 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// In-memory store
+// Data storage
 let energyData = {
   voltage: 0,
   current: 0,
   power: 0,
-  units: 0,
-  timestamp: new Date().toISOString()
+  units: 0
 };
 
-// POST (ESP32 → backend)
+// 🔹 UPDATE FROM ESP32
 app.post("/api/update", (req, res) => {
-  energyData = {
-    ...req.body,
-    timestamp: new Date().toISOString()
-  };
+  energyData = req.body;
   console.log("Received:", energyData);
-  res.status(200).send("OK");
+  res.send("OK");
 });
 
-// GET (React → backend)
+// 🔹 GET DATA (Frontend)
 app.get("/api/data", (req, res) => {
   res.json(energyData);
 });
 
-// Root (health check)
-app.get("/", (req, res) => {
-  res.send("Backend running successfully 🚀");
+// 🔹 RESET UNITS (BUTTON)
+app.post("/api/reset", (req, res) => {
+  energyData.units = 0;
+  console.log("Units reset!");
+  res.send("Reset Done");
 });
 
-// Render port
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+// ROOT
+app.get("/", (req, res) => {
+  res.send("Backend running 🚀");
 });
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log("Server started"));
